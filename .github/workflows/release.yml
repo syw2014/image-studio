@@ -1,0 +1,35 @@
+name: Release
+
+# 推送形如 v1.2.3 的 tag 时触发：跑测试，然后在 Releases 创建一个
+# 以该 tag 命名的「草稿」release，并自动生成 release notes。
+# GitHub 会自动把 tag 对应的源码压缩包（zip / tar.gz）附到 release 上。
+on:
+  push:
+    tags:
+      - "v*"
+
+# 允许内置的 GITHUB_TOKEN 创建 release。
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+
+      - name: Run tests
+        run: uv run --extra dev pytest
+
+      - name: Create draft release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "$GITHUB_REF_NAME" \
+            --draft \
+            --title "$GITHUB_REF_NAME" \
+            --generate-notes
