@@ -21,8 +21,11 @@ dev = [
   "pytest>=8",
 ]
 
+[project.scripts]
+image-studio = "run:main"
+
 [tool.setuptools]
-py-modules = ["app", "client", "models", "storage"]
+py-modules = ["app", "client", "models", "storage", "run"]
 include-package-data = true
 
 [tool.pytest.ini_options]
