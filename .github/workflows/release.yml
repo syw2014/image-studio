@@ -1,8 +1,8 @@
 name: Release
 
-# 推送形如 v1.2.3 的 tag 时触发：跑测试，然后在 Releases 创建一个
-# 以该 tag 命名的「草稿」release，并自动生成 release notes。
-# GitHub 会自动把 tag 对应的源码压缩包（zip / tar.gz）附到 release 上。
+# 推送形如 v1.2.3 的 tag 时触发：跑测试，把整个仓库打成源码包（tar.gz + zip），
+# 然后在 Releases 创建一个以该 tag 命名的「草稿」release，自动生成 release notes，
+# 并把源码包作为附件上传。
 on:
   push:
     tags:
@@ -25,11 +25,23 @@ jobs:
       - name: Run tests
         run: uv run --extra dev pytest
 
+      - name: Package repository archives
+        run: |
+          version="${GITHUB_REF_NAME#v}"
+          name="image-studio-${version}"
+          # 从当前检出的 tag 提交树打包，自动排除 .git 与未跟踪文件（.venv/data 等）。
+          git archive --format=tar.gz --prefix="${name}/" -o "${name}.tar.gz" HEAD
+          git archive --format=zip    --prefix="${name}/" -o "${name}.zip"    HEAD
+          ls -lh "${name}".tar.gz "${name}".zip
+
       - name: Create draft release
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
+          version="${GITHUB_REF_NAME#v}"
+          name="image-studio-${version}"
           gh release create "$GITHUB_REF_NAME" \
             --draft \
             --title "$GITHUB_REF_NAME" \
-            --generate-notes
+            --generate-notes \
+            "${name}.tar.gz" "${name}.zip"
