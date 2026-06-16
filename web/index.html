@@ -1,0 +1,284 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Image Studio</title>
+    <link rel="stylesheet" href="/static/styles.css" />
+  </head>
+  <body>
+    <!-- icon sprite -->
+    <svg width="0" height="0" style="position: absolute" aria-hidden="true">
+      <defs>
+        <symbol id="i-panel" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2" /><line x1="9" y1="4" x2="9" y2="20" /></symbol>
+        <symbol id="i-refresh" viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10" /><polyline points="1 20 1 14 7 14" /><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15" /></symbol>
+        <symbol id="i-check" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12" /></symbol>
+        <symbol id="i-check-sq" viewBox="0 0 24 24"><polyline points="9 11 12 14 22 4" /><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" /></symbol>
+        <symbol id="i-download" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /><polyline points="7 10 12 15 17 10" /><line x1="12" y1="15" x2="12" y2="3" /></symbol>
+        <symbol id="i-upload" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /><polyline points="17 8 12 3 7 8" /><line x1="12" y1="3" x2="12" y2="15" /></symbol>
+        <symbol id="i-send" viewBox="0 0 24 24"><path d="M22 2 11 13" /><path d="M22 2 15 22l-4-9-9-4 20-7z" /></symbol>
+        <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" /></symbol>
+        <symbol id="i-chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9" /></symbol>
+        <symbol id="i-copy" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2" /><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" /></symbol>
+        <symbol id="i-expand" viewBox="0 0 24 24"><polyline points="15 3 21 3 21 9" /><polyline points="9 21 3 21 3 15" /><line x1="21" y1="3" x2="14" y2="10" /><line x1="3" y1="21" x2="10" y2="14" /></symbol>
+        <symbol id="i-retry" viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10" /><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10" /></symbol>
+        <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" /><line x1="12" y1="16" x2="12" y2="12" /><line x1="12" y1="8" x2="12.01" y2="8" /></symbol>
+        <symbol id="i-x" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></symbol>
+        <symbol id="i-layers" viewBox="0 0 24 24"><polygon points="12 2 2 7 12 12 22 7 12 2" /><polyline points="2 17 12 22 22 17" /><polyline points="2 12 12 17 22 12" /></symbol>
+        <symbol id="i-sliders" viewBox="0 0 24 24"><line x1="4" y1="21" x2="4" y2="14" /><line x1="4" y1="10" x2="4" y2="3" /><line x1="12" y1="21" x2="12" y2="12" /><line x1="12" y1="8" x2="12" y2="3" /><line x1="20" y1="21" x2="20" y2="16" /><line x1="20" y1="12" x2="20" y2="3" /><line x1="1" y1="14" x2="7" y2="14" /><line x1="9" y1="8" x2="15" y2="8" /><line x1="17" y1="16" x2="23" y2="16" /></symbol>
+        <symbol id="i-alert" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" /><line x1="12" y1="8" x2="12" y2="13" /><line x1="12" y1="16" x2="12.01" y2="16" /></symbol>
+        <symbol id="i-sparkle" viewBox="0 0 24 24"><path d="M12 3l1.9 4.6L18.5 9.5 13.9 11.4 12 16l-1.9-4.6L5.5 9.5l4.6-1.9L12 3z" /></symbol>
+      </defs>
+    </svg>
+
+    <header class="topbar">
+      <div class="topbar-left">
+        <button class="nav-btn icon-only" id="panelToggle" type="button" title="折叠/展开配置面板" aria-label="折叠配置面板">
+          <svg class="icon"><use href="#i-panel" /></svg>
+        </button>
+        <button class="nav-btn" id="refreshHistoryBtn" type="button">
+          <svg class="icon icon-sm"><use href="#i-refresh" /></svg><span>刷新</span>
+        </button>
+        <span class="conn-pill warn" id="connPill"><span class="dot"></span>未配置</span>
+      </div>
+      <div class="topbar-center">
+        <span class="protocol-tag" id="protoTag">OpenAI Images</span>
+        <span class="model-tag" id="modelTag">gpt-image-2</span>
+      </div>
+      <div class="topbar-right">
+        <span class="credit-pill" id="historyMetric"><svg class="icon icon-sm"><use href="#i-layers" /></svg><span id="historyMetricNum">0</span></span>
+      </div>
+    </header>
+
+    <div class="shell" id="shell">
+      <main class="main">
+        <div class="main-head">
+          <div class="title-block">
+            <h1>生成记录</h1>
+            <span class="run-stats" id="runStats">
+              <span>已显示 <b id="shownCount">0</b> 条</span>
+              <span class="sep"></span>
+              <span class="ok">成功 <b id="okCount">0</b></span>
+              <span class="bad">失败 <b id="failCount">0</b></span>
+            </span>
+          </div>
+          <div class="head-actions" id="headActions">
+            <button class="btn" id="selectToggle" type="button">
+              <svg class="icon icon-sm"><use href="#i-check-sq" /></svg><span id="selectToggleLabel">选择</span>
+            </button>
+            <button class="btn" id="downloadShownBtn" type="button">
+              <svg class="icon icon-sm"><use href="#i-download" /></svg><span id="downloadLabel">下载成功图片</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="history-grid" id="historyGrid"></div>
+
+        <section class="composer" id="composer">
+          <div class="composer-refs" id="composerRefs"></div>
+          <div class="composer-main">
+            <div class="composer-tools">
+              <button class="round-btn" id="uploadBtn" type="button" title="上传参考图" aria-label="上传参考图">
+                <svg class="icon"><use href="#i-upload" /></svg>
+                <input id="referenceInput" type="file" accept="image/*" multiple hidden />
+              </button>
+            </div>
+            <div class="prompt-wrap">
+              <textarea id="promptInput" rows="1" placeholder="描述你想生成的图片…"></textarea>
+              <div class="popover" id="paramsPopover">
+                <h4>张数</h4>
+                <div class="seg" id="countSeg">
+                  <button type="button" data-count="1">1 张</button>
+                  <button type="button" data-count="2">2 张</button>
+                  <button type="button" data-count="4">4 张</button>
+                </div>
+                <h4>比例</h4>
+                <div class="seg" id="ratioSeg">
+                  <button type="button" data-ratio="1:1">1:1</button>
+                  <button type="button" data-ratio="9:16">9:16</button>
+                  <button type="button" data-ratio="16:9">16:9</button>
+                </div>
+              </div>
+            </div>
+            <button class="summary-chip" id="summaryChip" type="button">
+              <svg class="icon icon-sm"><use href="#i-sliders" /></svg><span id="summaryChipText">1 张 · 1:1 · 1K</span>
+            </button>
+            <button class="send-btn" id="sendBtn" type="button" title="生成" aria-label="生成">
+              <svg class="icon"><use href="#i-send" /></svg>
+            </button>
+          </div>
+          <div class="composer-foot">
+            <span class="foot-summary" id="footProvider">OpenAI · 1024x1024</span>
+            <span class="spacer"></span>
+            <span class="char-count"><span id="charCount">0</span> 字</span>
+          </div>
+        </section>
+      </main>
+
+      <aside class="config" id="config">
+        <div class="config-head">
+          <div>
+            <h2>配置</h2>
+            <p>API 与生成参数</p>
+          </div>
+        </div>
+
+        <!-- 连接 -->
+        <section class="group">
+          <div class="field">
+            <label for="protocolSelect">生图协议</label>
+            <select class="select" id="protocolSelect">
+              <option value="openai-images">OpenAI Images</option>
+              <option value="chat-completions">Chat Completions</option>
+            </select>
+          </div>
+          <div class="info-card" id="protocolInfo"></div>
+          <div class="field">
+            <label for="baseUrlSelect">API URL</label>
+            <select class="select" id="baseUrlSelect">
+              <option value="https://api.openai.com">OpenAI · https://api.openai.com</option>
+              <option value="https://openrouter.ai/api">OpenRouter · https://openrouter.ai/api</option>
+              <option value="__custom__">自定义…</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="baseUrlInput" id="baseUrlLabel">备用服务地址</label>
+            <input class="input" id="baseUrlInput" type="url" placeholder="留空则使用上面所选" />
+          </div>
+          <div class="field">
+            <label for="apiKeyInput">API Key</label>
+            <input class="input" id="apiKeyInput" type="password" autocomplete="off" placeholder="sk-…" />
+          </div>
+          <div class="hint-box">
+            <svg class="icon icon-sm"><use href="#i-sparkle" /></svg>
+            <span>推荐使用 banana Pro 官转或 OpenRouter 分组，稳定性更好。</span>
+          </div>
+          <label class="check-row"><input id="rememberKey" type="checkbox" /><span>记住 API Key（仅存浏览器本地）</span></label>
+          <button class="btn-dark btn-block" id="fetchModelsBtn" type="button">
+            <svg class="icon icon-sm"><use href="#i-refresh" /></svg><span>读取 / 刷新模型</span>
+          </button>
+          <div class="key-status" id="keyStatus"><svg class="icon"><use href="#i-info" /></svg><span>尚未读取上游模型</span></div>
+        </section>
+
+        <!-- 可用生图模型 -->
+        <section class="group">
+          <div class="collapse-head" style="margin-bottom: 6px"><span>可用生图模型</span></div>
+          <p class="catalog-hint">内置 gpt-image2 / seedream / nano-banana；读取上游后可选更多，选中自动切换接口格式与真实模型名。</p>
+          <div class="search-wrap">
+            <svg class="icon icon-sm"><use href="#i-search" /></svg>
+            <input id="modelSearch" type="text" placeholder="筛选模型" />
+          </div>
+          <div class="model-list" id="modelList"></div>
+        </section>
+
+        <!-- 生成参数 -->
+        <section class="group">
+          <div class="collapse-head" style="margin-bottom: 12px"><span>生成参数</span></div>
+          <div class="field field-2">
+            <div>
+              <label for="countInput">张数</label>
+              <input class="input" id="countInput" type="number" min="1" max="16" step="1" value="1" />
+            </div>
+            <div>
+              <label for="concurrencyInput">并发</label>
+              <input class="input" id="concurrencyInput" type="number" min="1" max="8" step="1" value="1" />
+            </div>
+          </div>
+          <div class="field" data-proto="openai-images">
+            <label for="sizeInput">尺寸</label>
+            <select class="select" id="sizeInput">
+              <option value="1024x1024">1:1 · 1024×1024</option>
+              <option value="1024x1536">2:3 · 1024×1536</option>
+              <option value="1536x1024">3:2 · 1536×1024</option>
+              <option value="1024x1792">9:16 · 1024×1792</option>
+              <option value="1792x1024">16:9 · 1792×1024</option>
+            </select>
+          </div>
+          <div class="field field-2" data-proto="chat-completions" hidden>
+            <div>
+              <label for="aspectRatioInput">宽高比</label>
+              <select class="select" id="aspectRatioInput">
+                <option value="1:1">1:1</option>
+                <option value="9:16">9:16</option>
+                <option value="16:9">16:9</option>
+                <option value="3:4">3:4</option>
+                <option value="4:3">4:3</option>
+              </select>
+            </div>
+            <div>
+              <label for="imageSizeInput">分辨率</label>
+              <select class="select" id="imageSizeInput">
+                <option value="1K">1K</option>
+                <option value="2K">2K</option>
+                <option value="4K">4K</option>
+              </select>
+            </div>
+          </div>
+          <div class="field field-2">
+            <div>
+              <label for="qualityInput">质量</label>
+              <select class="select" id="qualityInput">
+                <option value="auto">auto</option>
+                <option value="standard">standard</option>
+                <option value="hd">hd</option>
+              </select>
+            </div>
+            <div>
+              <label for="formatInput">格式</label>
+              <select class="select" id="formatInput">
+                <option value="png">PNG</option>
+                <option value="jpeg">JPEG</option>
+                <option value="webp">WEBP</option>
+              </select>
+            </div>
+          </div>
+          <div class="field">
+            <label for="negativePromptInput">负面提示词</label>
+            <textarea class="input" id="negativePromptInput" rows="3" placeholder="不想出现的内容"></textarea>
+          </div>
+
+          <details class="collapse">
+            <summary class="collapse-head"><span>高级参数</span><svg class="icon icon-sm"><use href="#i-chevron" /></svg></summary>
+            <div class="collapse-body">
+              <div class="field field-2">
+                <div><label for="seedInput">Seed</label><input class="input" id="seedInput" type="text" placeholder="随机" /></div>
+                <div><label for="timeoutInput">超时（秒）</label><input class="input" id="timeoutInput" type="number" min="10" step="10" value="180" /></div>
+              </div>
+              <div class="field field-2">
+                <div><label for="temperatureInput">温度</label><input class="input" id="temperatureInput" type="number" min="0" max="2" step="0.1" value="0.8" /></div>
+                <div><label for="maxTokensInput">Max tokens</label><input class="input" id="maxTokensInput" type="number" min="256" step="256" value="4096" /></div>
+              </div>
+              <div class="field">
+                <label for="retryInput">失败重试次数</label>
+                <input class="input" id="retryInput" type="number" min="0" max="5" step="1" value="1" />
+              </div>
+            </div>
+          </details>
+        </section>
+
+        <div class="hint-box neutral">
+          <svg class="icon icon-sm"><use href="#i-layers" /></svg>
+          <span>生成图片与历史保存在本地 data 目录，服务端只做协议转发，不存 API Key。</span>
+        </div>
+      </aside>
+    </div>
+
+    <!-- progress -->
+    <div class="progress-card" id="progressCard">
+      <div class="pc-head">
+        <span class="pc-left"><span class="spinner accent" id="pcSpin"></span><span class="pc-msg" id="pcMsg">任务进行中</span></span>
+        <span class="pc-pct" id="pcPct">0%</span>
+      </div>
+      <div class="pc-track"><div class="pc-fill" id="pcFill"></div></div>
+      <div class="pc-subs" id="pcSubs"></div>
+    </div>
+
+    <!-- overlay: lightbox / detail -->
+    <div class="overlay" id="overlay"></div>
+
+    <!-- toast -->
+    <div class="toast" id="toast"><svg class="icon icon-sm"><use href="#i-check" /></svg><span id="toastText"></span></div>
+
+    <script src="/static/app.js"></script>
+  </body>
+</html>

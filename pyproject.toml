@@ -1,0 +1,29 @@
+[build-system]
+requires = ["setuptools>=69", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "image-studio-local"
+version = "0.1.0"
+description = "Local image generation studio for relay APIs."
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+  "fastapi>=0.110",
+  "python-dotenv>=1.0",
+  "python-multipart>=0.0.9",
+  "requests>=2.31",
+  "uvicorn[standard]>=0.27",
+]
+
+[project.optional-dependencies]
+dev = [
+  "pytest>=8",
+]
+
+[tool.setuptools]
+py-modules = ["app", "client", "models", "storage"]
+include-package-data = true
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
